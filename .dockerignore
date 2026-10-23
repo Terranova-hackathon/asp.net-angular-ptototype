@@ -1,0 +1,8 @@
+**/bin
+**/obj
+**/node_modules
+frontend/dist
+frontend/.angular
+.git
+.env
+*.md
