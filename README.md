@@ -6,7 +6,7 @@ register / log in, then browse and search games from the [RAWG API](https://rawg
 ## Run it
 
 ```bash
-cp .env.example .env        # then fill in JWT_KEY and RAWG_API_KEY (see comments in the file)
+cp .env.example .env        # then fill in JWT_KEY, RAWG_API_KEY and STEAM_API_KEY (see comments in the file)
 docker compose up --build
 ```
 
@@ -33,8 +33,9 @@ That means no CORS, and the login cookie is simply "same site".
 | Project | Responsibility |
 |---|---|
 | `GameHub.Api` | The host. Builds the app, registers modules, serves Angular. Contains **no** feature logic. |
-| `GameHub.Auth` | Register / login / logout / me. ASP.NET Identity + JWT stored in an HttpOnly cookie. Owns the `auth` DB schema and migrations. |
+| `GameHub.Auth` | Register / login / logout / me, plus Sign in with Steam (OpenID). ASP.NET Identity + JWT stored in an HttpOnly cookie. Owns the `auth` DB schema and migrations. |
 | `GameHub.Games` | Search and details. Wraps RAWG behind `IGamesService`, with a caching decorator. |
+| `GameHub.Steam` | Steam profile, owned/recent games, friends and achievements for the logged-in user. Wraps the Steam Web API behind `ISteamService`, with a caching decorator. Has no database. |
 | `GameHub.Shared` | Tiny shared pieces: the `IModule` contract, `PagedResult<T>`, request validation. |
 
 Rules that keep it modular:
@@ -60,6 +61,19 @@ Rules that keep it modular:
 4. A 401 from any other API call makes the interceptor clear local state and redirect to `/login`.
 
 CSRF note: the cookie is `SameSite=Lax` and the API only accepts JSON, which covers this simple app. A larger app should add anti-forgery tokens.
+
+### Steam sign-in and the profile page
+
+Steam's website sign-in is **OpenID 2.0** (Steamworks OAuth is a separate flow that needs a Valve-issued Client ID). Sign-in only proves *which SteamID* the user is; the profile data comes from the Steam Web API using **our** server-side `Steam__ApiKey`.
+
+1. `GET /api/auth/steam` sets a short-lived state cookie and redirects to Steam. The callback URL includes the state.
+2. `GET /api/auth/steam/callback` checks that the response is for our exact callback URL, that Steam signed the claimed ID, and then asks Steam to confirm the signature (`check_authentication`). Only then is the SteamID trusted.
+3. Anonymous visitor: find or create the `AppUser` linked to that SteamID (`AspNetUserLogins`, provider `Steam`). Steam sign-ups get a placeholder `@steam.invalid` email, so they cannot use password login. Logged-in user: the SteamID is **linked** to their account. Accounts are never merged by email.
+4. Either way it finishes with the normal `AuthCookie.Write(...)`. The JWT carries a `steam_id` claim.
+5. `GameHub.Steam` reads that claim (`GameHubClaims.SteamId` in `Shared`), so it never references Auth and the SteamID never comes from the URL. Endpoints: `/api/steam/profile`, `/games`, `/games/recent`, `/friends`, `/games/{appId}/achievements`.
+6. The Angular profile page (`features/profile`) only calls those endpoints. Steam hides data per the user's privacy settings; each section returns `ok`, `private` or `nodata` and the page explains it.
+
+Setup: get a key at <https://steamcommunity.com/dev/apikey> and set `Steam__ApiKey`. Behind a reverse proxy, forward the original scheme and host (`UseForwardedHeaders`) so the callback URL matches what the browser used.
 
 ### Adding GitHub OAuth later
 

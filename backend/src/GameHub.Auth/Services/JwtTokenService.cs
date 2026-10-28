@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using GameHub.Auth.Domain;
 using GameHub.Auth.Options;
+using GameHub.Shared.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,7 +13,7 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> options) : ITokenServ
 {
     private readonly JwtOptions _options = options.Value;
 
-    public string CreateToken(AppUser user)
+    public string CreateToken(AppUser user, string? steamId = null)
     {
         var claims = new List<Claim>
         {
@@ -20,6 +21,11 @@ internal sealed class JwtTokenService(IOptions<JwtOptions> options) : ITokenServ
             new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
             new(ClaimTypes.Name, user.DisplayName ?? user.Email ?? user.Id),
         };
+
+        if (steamId is not null)
+        {
+            claims.Add(new Claim(GameHubClaims.SteamId, steamId));
+        }
 
         var credentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key)),

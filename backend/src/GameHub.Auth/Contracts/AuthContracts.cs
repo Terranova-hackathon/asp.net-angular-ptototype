@@ -11,4 +11,4 @@ public sealed record LoginRequest(
     [property: Required, EmailAddress] string Email,
     [property: Required] string Password);
 
-public sealed record UserResponse(string Id, string Email, string? DisplayName);
+public sealed record UserResponse(string Id, string Email, string? DisplayName, string? SteamId);

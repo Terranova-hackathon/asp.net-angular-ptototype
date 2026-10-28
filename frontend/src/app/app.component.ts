@@ -11,6 +11,7 @@ import { AuthService } from './core/auth/auth.service';
       <nav>
         @if (auth.user(); as user) {
           <a routerLink="/games" routerLinkActive="active">Games</a>
+          <a routerLink="/profile" routerLinkActive="active">Profile</a>
           <span class="muted">{{ user.displayName || user.email }}</span>
           <button type="button" class="link" (click)="auth.logout()">Log out</button>
         } @else {

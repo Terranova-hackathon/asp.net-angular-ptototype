@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { apiErrorMessage } from '../../core/api-error';
@@ -19,19 +19,21 @@ import { AuthService } from '../../core/auth/auth.service';
           Password
           <input type="password" formControlName="password" autocomplete="current-password" />
         </label>
-        @if (error()) {
-          <p class="error" role="alert">{{ error() }}</p>
+        @if (error() ?? steamError()) {
+          <p class="error" role="alert">{{ error() ?? steamError() }}</p>
         }
         <button type="submit" [disabled]="form.invalid || submitting()">
           {{ submitting() ? 'Signing in…' : 'Log in' }}
         </button>
       </form>
+      <p class="divider muted">or</p>
+      <a class="button steam" [href]="auth.steamLoginUrl">Sign in with Steam</a>
       <p class="muted">No account? <a routerLink="/register">Register</a></p>
     </section>
   `,
 })
 export class LoginComponent {
-  private readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -41,6 +43,13 @@ export class LoginComponent {
   });
   protected readonly error = signal<string | null>(null);
   protected readonly submitting = signal(false);
+
+  /** Set when the Steam sign-in redirects back here with ?steam=failed. */
+  protected readonly steamError = computed(() =>
+    this.route.snapshot.queryParamMap.get('steam') === 'failed'
+      ? 'Steam sign-in could not be verified. Please try again.'
+      : null,
+  );
 
   protected submit(): void {
     if (this.form.invalid) return;

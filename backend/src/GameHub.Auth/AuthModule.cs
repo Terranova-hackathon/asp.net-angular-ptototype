@@ -40,6 +40,7 @@ public sealed class AuthModule : IModule
             .AddEntityFrameworkStores<AuthDbContext>();
 
         services.AddSingleton<ITokenService, JwtTokenService>();
+        services.AddHttpClient<SteamOpenIdService>(client => client.Timeout = TimeSpan.FromSeconds(10));
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer();

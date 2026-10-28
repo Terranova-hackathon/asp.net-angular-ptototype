@@ -24,6 +24,7 @@ services:
       ConnectionStrings__Default: "Server=db;Database=GameHub;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True"
       Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env (at least 32 characters)}
       Rawg__ApiKey: ${RAWG_API_KEY:-}
+      Steam__ApiKey: ${STEAM_API_KEY:-}
 
 volumes:
   sqldata:

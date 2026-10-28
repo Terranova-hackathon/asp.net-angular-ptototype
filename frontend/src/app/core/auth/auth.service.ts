@@ -13,6 +13,9 @@ export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
+  /** Full-page navigation to the backend, which redirects to Steam and back. Not an XHR call. */
+  readonly steamLoginUrl = '/api/auth/steam';
+
   private readonly _user = signal<User | null>(null);
   readonly user = this._user.asReadonly();
   readonly isAuthenticated = computed(() => this._user() !== null);

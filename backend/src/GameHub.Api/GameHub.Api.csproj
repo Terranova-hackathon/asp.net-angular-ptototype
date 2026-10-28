@@ -4,6 +4,7 @@
     <ProjectReference Include="..\GameHub.Auth\GameHub.Auth.csproj" />
     <ProjectReference Include="..\GameHub.Games\GameHub.Games.csproj" />
     <ProjectReference Include="..\GameHub.Shared\GameHub.Shared.csproj" />
+    <ProjectReference Include="..\GameHub.Steam\GameHub.Steam.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,5 +4,5 @@ namespace GameHub.Auth.Services;
 
 public interface ITokenService
 {
-    string CreateToken(AppUser user);
+    string CreateToken(AppUser user, string? steamId = null);
 }

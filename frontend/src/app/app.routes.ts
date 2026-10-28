@@ -20,5 +20,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./features/games/games.routes').then((m) => m.GAMES_ROUTES),
   },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/profile/profile.component').then((m) => m.ProfileComponent),
+  },
   { path: '**', redirectTo: 'games' },
 ];

@@ -17,6 +17,7 @@ COPY backend/src/GameHub.Api/GameHub.Api.csproj src/GameHub.Api/
 COPY backend/src/GameHub.Auth/GameHub.Auth.csproj src/GameHub.Auth/
 COPY backend/src/GameHub.Games/GameHub.Games.csproj src/GameHub.Games/
 COPY backend/src/GameHub.Shared/GameHub.Shared.csproj src/GameHub.Shared/
+COPY backend/src/GameHub.Steam/GameHub.Steam.csproj src/GameHub.Steam/
 RUN dotnet restore src/GameHub.Api/GameHub.Api.csproj
 COPY backend/src/ src/
 RUN dotnet publish src/GameHub.Api/GameHub.Api.csproj -c Release -o /app --no-restore
