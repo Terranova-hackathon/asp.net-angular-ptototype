@@ -15,6 +15,7 @@ WORKDIR /src
 COPY backend/GameHub.sln ./
 COPY backend/src/GameHub.Api/GameHub.Api.csproj src/GameHub.Api/
 COPY backend/src/GameHub.Auth/GameHub.Auth.csproj src/GameHub.Auth/
+COPY backend/src/GameHub.Favorites/GameHub.Favorites.csproj src/GameHub.Favorites/
 COPY backend/src/GameHub.Games/GameHub.Games.csproj src/GameHub.Games/
 COPY backend/src/GameHub.Shared/GameHub.Shared.csproj src/GameHub.Shared/
 RUN dotnet restore src/GameHub.Api/GameHub.Api.csproj

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameHub.Auth\GameHub.Auth.csproj" />
+    <ProjectReference Include="..\GameHub.Favorites\GameHub.Favorites.csproj" />
     <ProjectReference Include="..\GameHub.Games\GameHub.Games.csproj" />
     <ProjectReference Include="..\GameHub.Shared\GameHub.Shared.csproj" />
   </ItemGroup>

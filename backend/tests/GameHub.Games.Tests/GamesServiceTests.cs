@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using GameHub.Games.Contracts;
 using GameHub.Games.Options;
 using GameHub.Games.Services;
 using Microsoft.Extensions.Caching.Memory;
@@ -82,6 +83,80 @@ public class GamesServiceTests
         await cached.SearchAsync("zelda", 2, 10);
 
         Assert.Equal(2, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task Search_SendsFiltersToRawg()
+    {
+        var handler = new StubHandler(HttpStatusCode.OK, ListJson);
+        var service = CreateRawgService(handler);
+        var filters = new GameSearchFilters(
+            ["action", "indie"], [1, 2], ["nintendo"], ["sega"], "-rating", 70, 95);
+
+        await service.SearchAsync(null, 1, 10, filters);
+
+        var uri = handler.LastRequest!.RequestUri!.AbsoluteUri;
+        Assert.Contains("genres=action,indie", uri);
+        Assert.Contains("parent_platforms=1,2", uri);
+        Assert.Contains("developers=nintendo", uri);
+        Assert.Contains("publishers=sega", uri);
+        Assert.Contains("ordering=-rating", uri);
+        Assert.Contains("metacritic=70,95", uri);
+    }
+
+    [Fact]
+    public async Task Search_WithoutFilters_SendsNoFilterParameters()
+    {
+        var handler = new StubHandler(HttpStatusCode.OK, ListJson);
+
+        await CreateRawgService(handler).SearchAsync("zelda", 1, 10);
+
+        var uri = handler.LastRequest!.RequestUri!.AbsoluteUri;
+        Assert.DoesNotContain("genres=", uri);
+        Assert.DoesNotContain("ordering=", uri);
+        Assert.DoesNotContain("metacritic=", uri);
+    }
+
+    [Fact]
+    public async Task Cache_KeepsDifferentFiltersApart_ButIgnoresOrderOfValues()
+    {
+        var handler = new StubHandler(HttpStatusCode.OK, ListJson);
+        var cached = new CachingGamesService(
+            CreateRawgService(handler), new MemoryCache(new MemoryCacheOptions()), TimeSpan.FromMinutes(5));
+
+        GameSearchFilters With(params string[] genres) => GameSearchFilters.None with { Genres = genres };
+
+        await cached.SearchAsync("x", 1, 10, With("action", "indie"));
+        await cached.SearchAsync("x", 1, 10, With("indie", "action"));
+        await cached.SearchAsync("x", 1, 10, With("action"));
+
+        Assert.Equal(2, handler.CallCount);
+    }
+
+    [Fact]
+    public async Task FilterOptions_MapGenresPlatformsAndOrderings()
+    {
+        const string json = """{"results": [{"id": 4, "name": "Action", "slug": "action"}]}""";
+        var options = await CreateRawgService(new StubHandler(HttpStatusCode.OK, json)).GetFilterOptionsAsync();
+
+        Assert.Equal(new FilterOption("action", "Action"), Assert.Single(options.Genres));
+        Assert.Equal(new FilterOption("4", "Action"), Assert.Single(options.Platforms));
+        Assert.Contains(options.Orderings, o => o.Value == "-rating");
+    }
+
+    [Fact]
+    public async Task SearchCompanies_UsesDevelopersOrPublishersEndpoint()
+    {
+        const string json = """{"results": [{"id": 1, "name": "Nintendo", "slug": "nintendo", "games_count": 387}]}""";
+        var handler = new StubHandler(HttpStatusCode.OK, json);
+        var service = CreateRawgService(handler);
+
+        var result = await service.SearchCompaniesAsync(CompanyKind.Publisher, "nin tendo");
+
+        Assert.Equal(new CompanyOption("nintendo", "Nintendo", 387), Assert.Single(result));
+        var uri = handler.LastRequest!.RequestUri!.AbsoluteUri;
+        Assert.Contains("/publishers?", uri);
+        Assert.Contains("search=nin%20tendo", uri);
     }
 
     private static RawgGamesService CreateRawgService(StubHandler handler, string apiKey = "test-key")

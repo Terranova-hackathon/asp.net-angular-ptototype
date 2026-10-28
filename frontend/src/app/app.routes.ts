@@ -20,5 +20,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadChildren: () => import('./features/games/games.routes').then((m) => m.GAMES_ROUTES),
   },
+  {
+    path: 'favorites',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/favorites/favorites-page.component').then((m) => m.FavoritesPageComponent),
+  },
   { path: '**', redirectTo: 'games' },
 ];

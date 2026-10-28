@@ -34,3 +34,16 @@ internal sealed class RawgPlatformEntry
 {
     [JsonPropertyName("platform")] public RawgNamed? Platform { get; set; }
 }
+
+internal sealed class RawgOptionList
+{
+    [JsonPropertyName("results")] public List<RawgOption> Results { get; set; } = [];
+}
+
+internal sealed class RawgOption
+{
+    [JsonPropertyName("id")] public int Id { get; set; }
+    [JsonPropertyName("name")] public string Name { get; set; } = string.Empty;
+    [JsonPropertyName("slug")] public string Slug { get; set; } = string.Empty;
+    [JsonPropertyName("games_count")] public int GamesCount { get; set; }
+}

@@ -23,3 +23,22 @@ export interface PagedResult<T> {
   totalCount: number;
   totalPages: number;
 }
+
+export interface FilterOption {
+  value: string;
+  name: string;
+}
+
+export interface GameFilterOptions {
+  genres: FilterOption[];
+  platforms: FilterOption[];
+  orderings: FilterOption[];
+}
+
+export interface CompanyOption {
+  slug: string;
+  name: string;
+  gamesCount: number;
+}
+
+export type CompanyKind = 'developer' | 'publisher';

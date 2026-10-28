@@ -1,10 +1,11 @@
 using GameHub.Auth;
+using GameHub.Favorites;
 using GameHub.Games;
 using GameHub.Shared.Modules;
 using Microsoft.AspNetCore.Diagnostics;
 
 // The host only wires modules together. Add a feature by adding a module here.
-IReadOnlyCollection<IModule> modules = [new AuthModule(), new GamesModule()];
+IReadOnlyCollection<IModule> modules = [new AuthModule(), new GamesModule(), new FavoritesModule()];
 
 var builder = WebApplication.CreateBuilder(args);
 

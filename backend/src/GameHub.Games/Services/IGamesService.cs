@@ -6,7 +6,13 @@ namespace GameHub.Games.Services;
 public interface IGamesService
 {
     Task<PagedResult<GameSummary>> SearchAsync(
-        string? search, int page, int pageSize, CancellationToken cancellationToken = default);
+        string? search, int page, int pageSize, GameSearchFilters? filters = null,
+        CancellationToken cancellationToken = default);
+
+    Task<GameFilterOptions> GetFilterOptionsAsync(CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<CompanyOption>> SearchCompaniesAsync(
+        CompanyKind kind, string search, CancellationToken cancellationToken = default);
 
     Task<GameDetails?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
 }

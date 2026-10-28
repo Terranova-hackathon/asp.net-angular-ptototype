@@ -34,7 +34,8 @@ That means no CORS, and the login cookie is simply "same site".
 |---|---|
 | `GameHub.Api` | The host. Builds the app, registers modules, serves Angular. Contains **no** feature logic. |
 | `GameHub.Auth` | Register / login / logout / me. ASP.NET Identity + JWT stored in an HttpOnly cookie. Owns the `auth` DB schema and migrations. |
-| `GameHub.Games` | Search and details. Wraps RAWG behind `IGamesService`, with a caching decorator. |
+| `GameHub.Games` | Search and details. Wraps RAWG behind `IGamesService`, with a caching decorator. Advanced search: `GET /api/games` accepts `genres`, `platforms`, `developers`, `publishers` (comma-separated, any-of), `ordering`, `metacriticMin`/`metacriticMax`; `GET /api/games/filters` lists the options and `GET /api/games/companies?kind=developer\|publisher&search=` is the company type-ahead. All values are validated against an allow-list/pattern. |
+| `GameHub.Favorites` | Per-user favorite games (`favorites` schema). Game name/image are looked up server-side through `IGameCatalog` (Shared), implemented by Games. Endpoints: `GET /api/favorites`, `GET /api/favorites/ids`, `PUT`/`DELETE /api/favorites/{rawgId}`. |
 | `GameHub.Shared` | Tiny shared pieces: the `IModule` contract, `PagedResult<T>`, request validation. |
 
 Rules that keep it modular:
@@ -124,6 +125,7 @@ This project is a **modular monolith**: one deployable ASP.NET Core application 
     │   │   ├── Endpoints/        Auth routes and HttpOnly cookie handling
     │   │   ├── Options/          Typed JWT configuration
     │   │   └── Services/         JWT token service and its interface
+    │   ├── GameHub.Favorites/    Favorites feature module
     │   └── GameHub.Games/        Game catalog feature module
     │       ├── Contracts/        Application-facing game response DTOs
     │       ├── Endpoints/        Search and game detail HTTP routes

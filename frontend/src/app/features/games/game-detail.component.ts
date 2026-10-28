@@ -3,6 +3,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { catchError, map, of, startWith, switchMap } from 'rxjs';
 import { apiErrorMessage } from '../../core/api-error';
+import { FavoriteButtonComponent } from '../favorites/favorite-button.component';
 import { GameDetails } from './games.models';
 import { GamesService } from './games.service';
 
@@ -13,7 +14,7 @@ type DetailState =
 
 @Component({
   selector: 'app-game-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, FavoriteButtonComponent],
   template: `
     <a routerLink="/games">← Back to games</a>
 
@@ -28,7 +29,7 @@ type DetailState =
         @if (game.backgroundImage) {
           <img [src]="game.backgroundImage" [alt]="game.name" />
         }
-        <h1>{{ game.name }}</h1>
+        <h1>{{ game.name }} <app-favorite-button [gameId]="game.id" /></h1>
         <p class="muted">
           Released {{ game.released ?? 'TBA' }} · ★ {{ game.rating }}
           @if (game.metacritic) { · Metacritic {{ game.metacritic }} }
