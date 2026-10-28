@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { Game } from '../../core/models/game.model';
+import { GameModel } from '../../core/models/game.model';
 
 @Component({
   imports: [],
@@ -8,5 +8,5 @@ import { Game } from '../../core/models/game.model';
   templateUrl: './game-card.html',
 })
 export class GameCard {
-  game = input.required<Game>();
+  game = input.required<GameModel>();
 }

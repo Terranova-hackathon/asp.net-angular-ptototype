@@ -1,4 +1,4 @@
-export interface Game {
+export interface GameModel {
 	id: number;
 	name: string;
 	background_image: string | null;
