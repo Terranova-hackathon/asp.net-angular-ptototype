@@ -1,0 +1,11 @@
+<main class="container py-5">
+  <h1>Explore Games</h1>
+
+  <div class="row g-4 mt-2">
+	@for (game of games; track game.id) {
+		<div class="col-12 col-md-6 col-lg-4 col-xl-3">
+			<app-game-card [game]="game" />
+		</div>
+	}
+  </div>
+</main>
