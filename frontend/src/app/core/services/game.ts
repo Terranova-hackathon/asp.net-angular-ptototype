@@ -2,6 +2,7 @@ import { inject, Service } from '@angular/core';
 import { GameModel } from '../models/game.model';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { PagedResult } from '../models/paged-result.model';
 
 @Service()
 export class GameService {
@@ -9,7 +10,7 @@ export class GameService {
 		{
       id: 3328,
       name: 'The Witcher 3: Wild Hunt',
-      background_image: null,
+      backgroundImage: null,
       released: '2015-05-19',
       rating: 4.64,
 	  metacritic: 4.64,
@@ -19,7 +20,7 @@ export class GameService {
     {
       id: 4200,
       name: 'Portal 2',
-      background_image: null,
+      backgroundImage: null,
       released: '2011-04-18',
       rating: 4.57,
 	  metacritic: 4.64,
@@ -28,11 +29,21 @@ export class GameService {
     }
 	];
 
+  private readonly http = inject(HttpClient);
+
 	getGames(): GameModel[] {
 		return this.games;
 	}
-	private readonly http = inject(HttpClient);
-	fetchGames(): Observable<GameModel[]> {
-		return this.http.get<GameModel[]>('/api/games');
+
+	fetchGames(): Observable<PagedResult<GameModel>> {
+		return this.http.get<PagedResult<GameModel>>(
+      '/api/games',
+      {
+        params: {
+          page: 1,
+          pageSize: 12
+        }
+      }
+    )
 	}
 }
